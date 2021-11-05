@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Let\'s Chat - No Login</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="both">Both</string>
+    <string name="please_fill_this_form">Please fill this form</string>
+    <string name="i_am">I am</string>
+    <string name="i_am_interested_in">I am interested in</string>
+    <string name="start_chatting">start chatting</string>
 </resources>
