@@ -3,8 +3,14 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="both">Both</string>
-    <string name="please_fill_this_form">Please fill this form</string>
+    <string name="please_fill_this_form">Please fill the form</string>
     <string name="i_am">I am</string>
     <string name="i_am_interested_in">I am interested in</string>
     <string name="start_chatting">start chatting</string>
+    <string name="end_chat">end chat</string>
+    <string name="write_your_message_here">Write your message here</string>
+    <string name="select_image">select image</string>
+    <string name="send_button">send button</string>
+    <string name="sorry_no_suitable_partner_found">Sorry, no suitable partner found.</string>
+    <string name="try_again">try again</string>
 </resources>
