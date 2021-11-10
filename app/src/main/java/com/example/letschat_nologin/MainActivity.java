@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             if(response.equals("200")) {
                 Intent intent = new Intent(MainActivity.this, chat.class);
+                intent.putExtra("myGender", myGender);
+                intent.putExtra("myInterest", myInterest);
                 startActivity(intent);
             } else {
                 cardView.setVisibility(View.VISIBLE);
