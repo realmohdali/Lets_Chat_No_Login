@@ -1,10 +1,15 @@
 package com.example.letschat_nologin;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,10 +31,20 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.letschat_nologin.services.checkConnection;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +63,7 @@ public class chat extends AppCompatActivity {
     String other_user;
     EditText msgBox;
     Intent checkConnectionServiceIntent;
+    ActivityResultLauncher<Intent> someActivityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +94,8 @@ public class chat extends AppCompatActivity {
 
         sendBtn.setOnClickListener(v -> sendMessage());
 
+        selectImage.setOnClickListener(v -> getImage());
+
         connect();
 
         checkConnectionServiceIntent = new Intent(this, checkConnection.class);
@@ -97,6 +117,76 @@ public class chat extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter(checkConnection.CONNECTION_BROADCAST);
         this.registerReceiver(broadcastReceiver, intentFilter);
 
+        someActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        // There are no request codes
+                        if (result.getData() != null) {
+                            Uri imageUri = result.getData().getData();
+                            if (imageUri != null) {
+                                try {
+                                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                                    final Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
+                                    final BottomSheetDialog dialog = new BottomSheetDialog(this);
+                                    View view = getLayoutInflater().inflate(R.layout.send_image, null, false);
+                                    dialog.setContentView(view);
+
+                                    ImageView imagePreview = view.findViewById(R.id.image_preview);
+                                    ImageView sendImage = view.findViewById(R.id.send_image);
+                                    ImageView cancelImageSend = view.findViewById(R.id.cancel_image_send);
+
+
+                                    imagePreview.setImageBitmap(bitmap);
+                                    dialog.setCancelable(false);
+                                    dialog.show();
+                                    sendImage.setOnClickListener(v -> {
+                                        String encodedImage = encodeBitmap(bitmap);
+                                        sendImage(encodedImage);
+                                        dialog.dismiss();
+                                    });
+                                    cancelImageSend.setOnClickListener(v -> dialog.dismiss());
+
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                    }
+                });
+
+    }
+
+    private String encodeBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] imageBytes = byteArrayOutputStream.toByteArray();
+        return android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
+    }
+
+    private void getImage() {
+
+        Dexter.withContext(this).withPermission(Manifest.permission.READ_EXTERNAL_STORAGE).withListener(new PermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_PICK);
+                someActivityResultLauncher.launch(Intent.createChooser(intent, "Select Image"));
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                permissionToken.continuePermissionRequest();
+            }
+        }).check();
     }
 
 
@@ -250,8 +340,41 @@ public class chat extends AppCompatActivity {
         stringRequest.setTag(TAG);
     }
 
-    private void sendImage() {
+    private void sendImage(String encodedImage) {
 
+        String url = "https://chat.curioustechguru.com/upload_image_android.php";
+        Toast.makeText(this, "Send image is called", Toast.LENGTH_SHORT).show();
+
+        // Request a string response from the provided URL.
+        stringRequest = new StringRequest(Request.Method.POST,
+                url,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        if (jsonObject.getString("code").equalsIgnoreCase("200")) {
+                            Toast.makeText(this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }, error -> {
+        }) {
+            @NonNull
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("other_user", other_user);
+                params.put("image", encodedImage);
+                return params;
+            }
+        };
+
+        // Add the request to the RequestQueue.
+        stringRequest.setShouldCache(false);
+        queue.add(stringRequest);
+        stringRequest.setTag(TAG);
     }
 
     private void getMessage() {
