@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         stringRequest = new StringRequest(Request.Method.POST, url, response -> {
             progressBar.setVisibility(View.GONE);
             if(response.equals("200")) {
-                Intent intent = new Intent(MainActivity.this, chat.class);
+                Intent intent = new Intent(MainActivity.this, Chat.class);
                 intent.putExtra("myGender", myGender);
                 intent.putExtra("myInterest", myInterest);
                 startActivity(intent);

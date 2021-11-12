@@ -16,7 +16,7 @@
             android:name=".ViewImage"
             android:exported="false" />
         <activity
-            android:name=".chat"
+            android:name=".Chat"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.checkConnection" />
+        <service android:name=".services.BackgroundService" />
     </application>
 
 </manifest>

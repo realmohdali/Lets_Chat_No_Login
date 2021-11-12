@@ -24,13 +24,16 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.letschat_nologin.services.checkConnection;
+import com.example.letschat_nologin.adapter.ChatAdapter;
+import com.example.letschat_nologin.data.MessageData;
+import com.example.letschat_nologin.services.BackgroundService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -45,10 +48,11 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class chat extends AppCompatActivity {
+public class Chat extends AppCompatActivity {
 
     private static final String TAG = "MyTag";
     ProgressBar progressBar;
@@ -64,6 +68,9 @@ public class chat extends AppCompatActivity {
     EditText msgBox;
     Intent checkConnectionServiceIntent;
     ActivityResultLauncher<Intent> someActivityResultLauncher;
+    String connection = "false";
+    ArrayList<MessageData> messageDataArrayList;
+    ChatAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +103,17 @@ public class chat extends AppCompatActivity {
 
         selectImage.setOnClickListener(v -> getImage());
 
+        messageDataArrayList = new ArrayList<>();
+
+        chatView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new ChatAdapter(messageDataArrayList);
+
+        chatView.setAdapter(adapter);
+
         connect();
 
-        checkConnectionServiceIntent = new Intent(this, checkConnection.class);
+        checkConnectionServiceIntent = new Intent(this, BackgroundService.class);
         startService(checkConnectionServiceIntent);
 
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -107,15 +122,44 @@ public class chat extends AppCompatActivity {
                 String connectStatus = intent.getStringExtra("data");
                 if (connectStatus.equalsIgnoreCase("user connected")) {
                     other_user = intent.getStringExtra("other_user");
+                    connection = "true";
                     connected();
                 } else {
+                    connection = "false";
                     disconnected();
                 }
             }
         };
 
-        IntentFilter intentFilter = new IntentFilter(checkConnection.CONNECTION_BROADCAST);
+        IntentFilter intentFilter = new IntentFilter(BackgroundService.CONNECTION_BROADCAST);
         this.registerReceiver(broadcastReceiver, intentFilter);
+
+        BroadcastReceiver newMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                Bundle args = intent.getBundleExtra("msgData");
+
+                ArrayList<MessageData> newMessages = (ArrayList<MessageData>) args.getSerializable("messageData");
+
+                for (int i = 0; i < newMessages.size(); i++) {
+                    String msg = newMessages.get(i).getMessage();
+                    String type = newMessages.get(i).getType();
+                    String sender = newMessages.get(i).getSender();
+                    MessageData messageData = new MessageData();
+                    messageData.setMessage(msg);
+                    messageData.setType(type);
+                    messageData.setSender(sender);
+                    messageDataArrayList.add(messageData);
+                    adapter.notifyItemInserted(adapter.getItemCount()-1);
+                    chatView.scrollToPosition(adapter.getItemCount()-1);
+                }
+                //String newMessage = intent.getStringExtra("data");
+            }
+        };
+
+        IntentFilter newMessageIntentFilter = new IntentFilter(BackgroundService.MESSAGE_BROADCAST);
+        this.registerReceiver(newMessageReceiver, newMessageIntentFilter);
 
         someActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -209,15 +253,19 @@ public class chat extends AppCompatActivity {
     }
 
     private void disconnect() {
-        new AlertDialog.Builder(this)
-                .setTitle("Confirm")
-                .setMessage("Are you sure to leave the chat?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    endChat();
-                    stopService(checkConnectionServiceIntent);
-                    finish();
-                })
-                .setNegativeButton("No", null).show();
+        if (connection.equalsIgnoreCase("true")) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirm")
+                    .setMessage("Are you sure to leave the chat?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        endChat();
+                        stopService(checkConnectionServiceIntent);
+                        finish();
+                    })
+                    .setNegativeButton("No", null).show();
+        } else {
+            finish();
+        }
     }
 
     private void connect() {
@@ -322,6 +370,13 @@ public class chat extends AppCompatActivity {
         stringRequest = new StringRequest(Request.Method.POST,
                 url,
                 response -> {
+                    MessageData messageData = new MessageData();
+                    messageData.setMessage(msg);
+                    messageData.setType("1");
+                    messageData.setSender("me");
+                    messageDataArrayList.add(messageData);
+                    adapter.notifyItemInserted(adapter.getItemCount()-1);
+                    chatView.scrollToPosition(adapter.getItemCount()-1);
                 }, error -> {
         }) {
             @NonNull
