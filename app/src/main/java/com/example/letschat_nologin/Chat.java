@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -111,6 +112,15 @@ public class Chat extends AppCompatActivity {
 
         chatView.setAdapter(adapter);
 
+        msgBox.setImeActionLabel("SEND", KeyEvent.KEYCODE_ENTER);
+
+        msgBox.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == KeyEvent.KEYCODE_ENTER) {
+                sendMessage();
+            }
+            return true;
+        });
+
         connect();
 
         checkConnectionServiceIntent = new Intent(this, BackgroundService.class);
@@ -151,8 +161,8 @@ public class Chat extends AppCompatActivity {
                     messageData.setType(type);
                     messageData.setSender(sender);
                     messageDataArrayList.add(messageData);
-                    adapter.notifyItemInserted(adapter.getItemCount()-1);
-                    chatView.scrollToPosition(adapter.getItemCount()-1);
+                    adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                    chatView.scrollToPosition(adapter.getItemCount() - 1);
                 }
                 //String newMessage = intent.getStringExtra("data");
             }
@@ -186,7 +196,7 @@ public class Chat extends AppCompatActivity {
                                     dialog.show();
                                     sendImage.setOnClickListener(v -> {
                                         String encodedImage = encodeBitmap(bitmap);
-                                        sendImage(encodedImage);
+                                        sendImageFile(encodedImage, bitmap);
                                         dialog.dismiss();
                                     });
                                     cancelImageSend.setOnClickListener(v -> dialog.dismiss());
@@ -281,13 +291,6 @@ public class Chat extends AppCompatActivity {
                 url,
                 response -> {
                     try {
-                        /*JSONArray jsonArray = new JSONArray(response);
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-                            String code = jsonObject.getString("code");
-                            other_user = jsonObject.getString("other_user");*/
-
                         JSONObject jsonObject = new JSONObject(response);
                         String code = jsonObject.getString("code");
                         other_user = jsonObject.getString("other_user");
@@ -364,19 +367,21 @@ public class Chat extends AppCompatActivity {
     private void sendMessage() {
         String msg = msgBox.getText().toString();
         msgBox.setText("");
+
+        MessageData messageData = new MessageData();
+        messageData.setMessage(msg);
+        messageData.setType("1");
+        messageData.setSender("me");
+        messageDataArrayList.add(messageData);
+        adapter.notifyItemInserted(adapter.getItemCount() - 1);
+        chatView.scrollToPosition(adapter.getItemCount() - 1);
+
         String url = "https://chat.curioustechguru.com/script/send_message.php";
 
         // Request a string response from the provided URL.
         stringRequest = new StringRequest(Request.Method.POST,
                 url,
                 response -> {
-                    MessageData messageData = new MessageData();
-                    messageData.setMessage(msg);
-                    messageData.setType("1");
-                    messageData.setSender("me");
-                    messageDataArrayList.add(messageData);
-                    adapter.notifyItemInserted(adapter.getItemCount()-1);
-                    chatView.scrollToPosition(adapter.getItemCount()-1);
                 }, error -> {
         }) {
             @NonNull
@@ -395,10 +400,20 @@ public class Chat extends AppCompatActivity {
         stringRequest.setTag(TAG);
     }
 
-    private void sendImage(String encodedImage) {
+    private void sendImageFile(String encodedImage, Bitmap bitmap) {
+
+        MessageData messageData = new MessageData();
+        messageData.setBitmap(bitmap);
+        messageData.setType("2");
+        messageData.setSender("me");
+        messageDataArrayList.add(messageData);
+        adapter.notifyItemInserted(adapter.getItemCount() - 1);
+        chatView.scrollToPosition(adapter.getItemCount() - 1);
+
+        int index = adapter.getItemCount() - 1;
 
         String url = "https://chat.curioustechguru.com/upload_image_android.php";
-        Toast.makeText(this, "Send image is called", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Send image is called", Toast.LENGTH_SHORT).show();
 
         // Request a string response from the provided URL.
         stringRequest = new StringRequest(Request.Method.POST,
@@ -407,7 +422,13 @@ public class Chat extends AppCompatActivity {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         if (jsonObject.getString("code").equalsIgnoreCase("200")) {
-                            Toast.makeText(this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                            String imageUrl = jsonObject.getString("img_url");
+                            MessageData newMessageData = new MessageData();
+                            newMessageData.setMessage(imageUrl);
+                            newMessageData.setType("3");
+                            newMessageData.setSender("me");
+                            messageDataArrayList.set(index, newMessageData);
+                            adapter.notifyItemChanged(index);
                         } else {
                             Toast.makeText(this, "Upload Failed", Toast.LENGTH_SHORT).show();
                         }
@@ -431,9 +452,4 @@ public class Chat extends AppCompatActivity {
         queue.add(stringRequest);
         stringRequest.setTag(TAG);
     }
-
-    private void getMessage() {
-
-    }
-
 }

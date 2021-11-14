@@ -31,6 +31,14 @@
             android:layout_height="250dp"
             android:scaleType="fitCenter"
             android:src="@drawable/test" />
+
+        <ProgressBar
+            android:id="@+id/received_image_progress"
+            android:layout_marginTop="100dp"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:progressTint="@color/white" />
+
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -64,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/gray"
         app:cardCornerRadius="5dp"
         app:cardElevation="5dp"
         app:cardPreventCornerOverlap="true"
@@ -83,6 +91,13 @@
             android:scaleType="fitCenter"
             android:src="@drawable/test" />
 
+        <ProgressBar
+            android:id="@+id/sent_image_progress"
+            android:layout_marginTop="100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progressTint="@color/purple_500" />
+
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -91,7 +106,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/gray"
         app:cardCornerRadius="5dp"
         app:cardElevation="5dp"
         app:cardPreventCornerOverlap="true"

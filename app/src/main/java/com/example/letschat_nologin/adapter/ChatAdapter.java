@@ -1,16 +1,20 @@
 package com.example.letschat_nologin.adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.letschat_nologin.R;
+import com.example.letschat_nologin.ViewImage;
 import com.example.letschat_nologin.data.MessageData;
 
 import java.util.ArrayList;
@@ -40,22 +44,47 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         String type = newMessageData.getType();
         String sender = newMessageData.getSender();
-        if(type.equals("1")) {
-            if(sender.equalsIgnoreCase("other")) {
-                holder.receivedText.setVisibility(View.VISIBLE);
-                holder.receivedTextView.setText(newMessageData.getMessage());
-            } else {
-                holder.sentText.setVisibility(View.VISIBLE);
-                holder.sentTextView.setText(newMessageData.getMessage());
-            }
-        } else {
-            if(sender.equalsIgnoreCase("other")) {
-                holder.receivedText.setVisibility(View.VISIBLE);
-                holder.receivedTextView.setText("New Image Received");
-            } else {
-                holder.sentTextView.setVisibility(View.VISIBLE);
-                holder.sentTextView.setText("New Image Sent");
-            }
+        switch (type) {
+            case "1":
+                if (sender.equalsIgnoreCase("other")) {
+                    holder.receivedText.setVisibility(View.VISIBLE);
+                    holder.receivedTextView.setText(newMessageData.getMessage());
+                } else {
+                    holder.sentText.setVisibility(View.VISIBLE);
+                    holder.sentTextView.setText(newMessageData.getMessage());
+                }
+                break;
+            case "2":
+                if (sender.equalsIgnoreCase("other")) {
+                    String url = "https://chat.curioustechguru.com/" + newMessageData.getMessage();
+                    holder.receivedImage.setVisibility(View.VISIBLE);
+                    Glide.with(holder.receivedTextView.getContext()).load(url).into(holder.receivedImageView);
+                    holder.receivedImageProgress.setVisibility(View.GONE);
+                    holder.receivedImageView.setOnClickListener(v -> {
+                        Intent intent = new Intent(v.getContext(), ViewImage.class);
+                        intent.putExtra("sender", "other");
+                        intent.putExtra("url", url);
+                        v.getContext().startActivity(intent);
+                    });
+                } else {
+                    holder.sentImage.setVisibility(View.VISIBLE);
+                    holder.sentImageView.setImageBitmap(newMessageData.getBitmap());
+                    holder.sentImageProgress.setVisibility(View.VISIBLE);
+                }
+                break;
+            case "3":
+                String url = "https://chat.curioustechguru.com/" + newMessageData.getMessage();
+                holder.sentImage.setVisibility(View.VISIBLE);
+                Glide.with(holder.sentImageView.getContext()).load(url).into(holder.sentImageView);
+                holder.sentImageProgress.setVisibility(View.GONE);
+
+                holder.sentImageView.setOnClickListener(v -> {
+                    Intent intent = new Intent(v.getContext(), ViewImage.class);
+                    intent.putExtra("sender", "other");
+                    intent.putExtra("url", url);
+                    v.getContext().startActivity(intent);
+                });
+                break;
         }
     }
 
@@ -68,6 +97,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         CardView sentImage, sentText, receivedImage, receivedText;
         TextView sentTextView, receivedTextView;
         ImageView sentImageView, receivedImageView;
+        ProgressBar sentImageProgress, receivedImageProgress;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             sentImage = itemView.findViewById(R.id.sent_image);
@@ -80,6 +111,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
             sentImageView = itemView.findViewById(R.id.sent_image_view);
             receivedImageView = itemView.findViewById(R.id.received_image_view);
+
+            sentImageProgress = itemView.findViewById(R.id.sent_image_progress);
+            receivedImageProgress = itemView.findViewById(R.id.received_image_progress);
         }
     }
 }

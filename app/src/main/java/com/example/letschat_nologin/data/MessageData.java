@@ -1,7 +1,10 @@
 package com.example.letschat_nologin.data;
 
-public class MessageData implements java.io.Serializable{
+import android.graphics.Bitmap;
+
+public class MessageData implements java.io.Serializable {
     public String type, message, sender;
+    Bitmap bitmap;
 
     public MessageData() {
     }
@@ -28,5 +31,13 @@ public class MessageData implements java.io.Serializable{
 
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 }
