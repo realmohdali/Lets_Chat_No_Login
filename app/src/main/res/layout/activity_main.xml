@@ -62,12 +62,14 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/gender_male"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="@string/male" />
 
                 <RadioButton
+                    android:id="@+id/gender_female"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
@@ -89,23 +91,45 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/selected_male"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/male" />
 
                 <RadioButton
+                    android:id="@+id/selected_female"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:text="@string/female" />
 
                 <RadioButton
+                    android:id="@+id/selected_other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:checked="true"
                     android:text="@string/both" />
             </RadioGroup>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
+
+                <TextView
+                    android:id="@+id/privacy_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:layout_toEndOf="@id/checkbox"
+                    android:text="@string/declaration" />
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/start_chat_btn"

@@ -1,9 +1,12 @@
 package com.example.letschat_nologin;
 
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -42,11 +45,14 @@ public class MainActivity extends AppCompatActivity {
             System.exit(0);
         }
         btn = findViewById(R.id.start_chat_btn);
-        gender = findViewById(R.id.gender_radio);
-        interest = findViewById(R.id.interest_radio);
+        gender = (RadioGroup) findViewById(R.id.gender_radio);
+        interest = (RadioGroup) findViewById(R.id.interest_radio);
         cardView = findViewById(R.id.cardView);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.text_view);
+
+        TextView privacyLink = findViewById(R.id.privacy_link);
+        privacyLink.setMovementMethod(LinkMovementMethod.getInstance());
 
         btn.setOnClickListener(v -> {
             int selectedGender = gender.getCheckedRadioButtonId();
@@ -57,7 +63,12 @@ public class MainActivity extends AppCompatActivity {
             String myGender = genderButton.getText().toString();
             String myInterest = interestButton.getText().toString();
 
-            startChat(myGender, myInterest);
+            CheckBox checkBox = findViewById(R.id.checkbox);
+            if(checkBox.isChecked()) {
+                startChat(myGender, myInterest);
+            } else {
+                Toast.makeText(this, "Please check the declaration", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

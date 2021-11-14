@@ -368,20 +368,19 @@ public class Chat extends AppCompatActivity {
         String msg = msgBox.getText().toString();
         msgBox.setText("");
 
-        MessageData messageData = new MessageData();
-        messageData.setMessage(msg);
-        messageData.setType("1");
-        messageData.setSender("me");
-        messageDataArrayList.add(messageData);
-        adapter.notifyItemInserted(adapter.getItemCount() - 1);
-        chatView.scrollToPosition(adapter.getItemCount() - 1);
-
         String url = "https://chat.curioustechguru.com/script/send_message.php";
 
         // Request a string response from the provided URL.
         stringRequest = new StringRequest(Request.Method.POST,
                 url,
                 response -> {
+                    MessageData messageData = new MessageData();
+                    messageData.setMessage(msg);
+                    messageData.setType("1");
+                    messageData.setSender("me");
+                    messageDataArrayList.add(messageData);
+                    adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                    chatView.scrollToPosition(adapter.getItemCount() - 1);
                 }, error -> {
         }) {
             @NonNull

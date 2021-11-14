@@ -13,4 +13,6 @@
     <string name="send_button">send button</string>
     <string name="sorry_no_suitable_partner_found">Sorry, no suitable partner found.</string>
     <string name="try_again">try again</string>
+    <string name="declaration">I declare that I am at least 18 years of age
+        and have read and accept the <a href="https://chat.curioustechguru.com/privacy-policy.php">Privacy Policy</a></string>
 </resources>
