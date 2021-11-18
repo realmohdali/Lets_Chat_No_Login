@@ -1,4 +1,4 @@
-package com.example.letschat_nologin;
+package com.curioustechguru.letschat_nologin;
 
 
 import android.content.Intent;

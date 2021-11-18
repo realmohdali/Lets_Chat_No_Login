@@ -1,4 +1,4 @@
-package com.example.letschat_nologin.data;
+package com.curioustechguru.letschat_nologin.data;
 
 import android.graphics.Bitmap;
 

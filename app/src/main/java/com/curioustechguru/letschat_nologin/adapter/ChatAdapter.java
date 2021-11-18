@@ -1,4 +1,4 @@
-package com.example.letschat_nologin.adapter;
+package com.curioustechguru.letschat_nologin.adapter;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -13,9 +13,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.letschat_nologin.R;
-import com.example.letschat_nologin.ViewImage;
-import com.example.letschat_nologin.data.MessageData;
+import com.curioustechguru.letschat_nologin.R;
+import com.curioustechguru.letschat_nologin.ViewImage;
+import com.curioustechguru.letschat_nologin.data.MessageData;
 
 import java.util.ArrayList;
 

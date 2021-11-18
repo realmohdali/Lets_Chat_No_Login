@@ -1,12 +1,10 @@
-package com.example.letschat_nologin.services;
+package com.curioustechguru.letschat_nologin.services;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.volley.AuthFailureError;
@@ -16,7 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.letschat_nologin.data.MessageData;
+import com.curioustechguru.letschat_nologin.data.MessageData;
 
 import org.json.JSONArray;
 import org.json.JSONException;

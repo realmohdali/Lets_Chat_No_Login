@@ -1,4 +1,4 @@
-package com.example.letschat_nologin;
+package com.curioustechguru.letschat_nologin;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -33,9 +33,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.letschat_nologin.adapter.ChatAdapter;
-import com.example.letschat_nologin.data.MessageData;
-import com.example.letschat_nologin.services.BackgroundService;
+import com.curioustechguru.letschat_nologin.adapter.ChatAdapter;
+import com.curioustechguru.letschat_nologin.data.MessageData;
+import com.curioustechguru.letschat_nologin.services.BackgroundService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
